@@ -218,6 +218,9 @@ const baseEnv = {
   ASSISTANTS_API_KEY: 'e2e-mock-assistants-key',
   ASSISTANTS_BASE_URL: `http://127.0.0.1:${ASSISTANTS_PORT}/v1`,
   ASSISTANTS_MODELS: 'gpt-4o-mini',
+  /** Enables the native Google provider for agents. The run hook replaces the model, so the
+   *  key never reaches Google; it only lets attachments take the Google encoding path. */
+  GOOGLE_KEY: 'e2e-mock-google-key',
   ...(process.env.E2E_CODE_BRIDGE_ADMIN_TOKEN
     ? { E2E_CODE_BRIDGE_ADMIN_TOKEN: process.env.E2E_CODE_BRIDGE_ADMIN_TOKEN }
     : {}),
@@ -228,6 +231,8 @@ const baseEnv = {
   RAG_API_URL: `http://127.0.0.1:${RAG_API_PORT}`,
   /** Pull request lookups go to the fake git host, which trusts any bearer token. */
   E2E_GIT_HOST_TOKEN: 'e2e-git-host-token',
+  /** Resolved into the `e2e-memory` MCP server's env reference. */
+  E2E_MCP_DEPLOYMENT: 'e2e-deployment',
   NODE_EXTRA_CA_CERTS: gitHostCertPath,
   ...vanillaOverrides,
 };
@@ -262,8 +267,7 @@ function writeRuntimeMockConfig() {
     ? {
         allowedDomain: '- http://127.0.0.1:8766',
         stdioEnv: [
-          'env:',
-          '      E2E_MCP_LIST_CHANGED: "true"',
+          'E2E_MCP_LIST_CHANGED: "true"',
           `      E2E_MCP_STATE_PATH: ${JSON.stringify(MCP_STATE_PATH)}`,
         ].join('\n'),
         networkServers: [
